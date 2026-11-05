@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>有給の残日数 計算ツール｜いつ何日消えるかもわかる</title>
+<meta name="description" content="入社日と使った日数を入れるだけで、有給の残日数と、次に消える日・消える日数がわかる無料ツール。フルタイムの法定付与日数（令和8年時点）で計算します。">
+<link rel="canonical" href="https://by8k98rff4-gif.github.io/shokuba-tools/yukyu/">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="../">職場の計算ツール</a> › 有給の残日数</div>
+  <h1>有給の残日数 計算ツール</h1>
+  <p class="lead">入社日と、いま有効な有給から使った日数を入れるだけ。残りの日数と、次に何日消えるかがわかります。</p>
+
+  <div class="card">
+    <form id="f">
+      <div class="field">
+        <label for="hire">入社日</label>
+        <input id="hire" type="date" required>
+      </div>
+      <div class="field">
+        <label for="used">いま有効な有給から使った日数</label>
+        <span class="hint">前回と前々回にもらった分から使った日数の合計です。わからなければ、給与明細の「有給取得」をここ1〜2年分足してみてください。半日は0.5。</span>
+        <input id="used" type="number" inputmode="decimal" min="0" step="0.5" value="0">
+      </div>
+      <div class="field">
+        <label for="today">基準日</label>
+        <span class="hint">ふつうは今日のままで大丈夫です。</span>
+        <input id="today" type="date">
+      </div>
+      <button class="calc" type="submit">計算する</button>
+    </form>
+
+    <div class="result" id="res" aria-live="polite">
+      <div class="note">いま使える有給</div>
+      <div class="big" id="remain">0<small>日</small></div>
+      <div class="alert" id="expire"></div>
+      <div class="tblwrap">
+        <table class="rows" id="tbl">
+          <thead><tr><th>もらった日</th><th>日数</th><th>消える日</th><th>残り</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="alert" id="next"></div>
+      <div class="cta">毎月の取得や消える日をまとめて管理するなら、Excel版が便利です。→ <a href="https://note.com/shokuba_tenpure" rel="noopener">職場のテンプレ係（note）</a></div>
+    </div>
+  </div>
+
+  <h2>計算のしかた</h2>
+  <p>フルタイム（週5日以上、または週30時間以上）の人が法律でもらえる日数で計算しています。入社して6か月で10日、そこから1年ごとに11日、12日、14日、16日、18日と増えて、6年6か月以降は毎年20日です。</p>
+  <p>有給は、もらってから2年たつと時効で消えてしまいます。なので、いま使えるのは「前回もらった分」と「その前にもらった分」の2回分だけです。使うときは古い方から減っていく、という会社が多いので、このツールもその順番で計算しています。</p>
+  <p class="note">令和8年（2026年）時点の労働基準法にもとづく法定の日数です。会社によっては法律より多くもらえたり、入社日に関係なく全員同じ日にもらえる（斉一的付与）こともあります。正確な日数は就業規則か人事に確認してください。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>パートやアルバイトでも使えますか？</dt>
+    <dd>週4日以下かつ週30時間未満の人は、働く日数に応じて少ない日数がもらえます（比例付与）。このツールはフルタイムの日数で計算するので、多めに出てしまいます。</dd>
+    <dt>年5日は必ず取らないといけないって本当ですか？</dt>
+    <dd>年に10日以上もらう人は、もらってから1年以内に5日は取らせることが会社の義務になっています。取れていないときは会社が時季を指定することもあります。</dd>
+    <dt>消える前に買い取ってもらえますか？</dt>
+    <dd>原則として買い取りはできません。ただ、時効で消える分や退職時に残った分を、会社が自主的に買い取ることは認められています。会社の規則次第です。</dd>
+  </dl>
+
+  <footer>
+    <p>このツールは入力した内容をどこにも送信しません。計算はお使いの端末の中だけで行われます。</p>
+    <p><a href="../">他の計算ツールを見る</a></p>
+  </footer>
+</div>
+<script>
+(function(){
+  // 法定付与日数（フルタイム）：勤続年数 0.5,1.5,2.5,3.5,4.5,5.5,6.5年以上
+  var DAYS=[10,11,12,14,16,18,20];
+  function ymd(d){return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();}
+  function addMonths(d,m){var x=new Date(d.getFullYear(),d.getMonth()+m,d.getDate());if(x.getDate()!==d.getDate())x=new Date(d.getFullYear(),d.getMonth()+m+1,0);return x;}
+  function addDays(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);}
+  function parse(v){var p=v.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+  function grants(hire,today){
+    var list=[];for(var i=0;;i++){var g=addMonths(hire,6+12*i);if(g>today)break;list.push({date:g,days:DAYS[Math.min(i,6)],exp:addDays(addMonths(g,24),-1)});}
+    return list;
+  }
+  window.yukyuCalc=function(hireStr,used,todayStr){
+    var hire=parse(hireStr),today=parse(todayStr);
+    var all=grants(hire,today);
+    var valid=all.filter(function(g){return g.exp>=today;});
+    var u=Math.max(0,used||0);
+    valid.forEach(function(g){var take=Math.min(g.days,u);g.left=g.days-take;u-=take;});
+    var remain=valid.reduce(function(s,g){return s+g.left;},0);
+    var next=addMonths(hire,6+12*all.length);
+    return {valid:valid,remain:remain,over:u,next:next,nextDays:DAYS[Math.min(all.length,6)]};
+  };
+  var f=document.getElementById('f'),t=document.getElementById('today');
+  var now=new Date();t.value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var h=document.getElementById('hire').value;if(!h)return;
+    var r=yukyuCalc(h,parseFloat(document.getElementById('used').value)||0,t.value);
+    document.getElementById('remain').innerHTML=r.remain+'<small>日</small>';
+    var tb=document.querySelector('#tbl tbody');tb.innerHTML='';
+    r.valid.forEach(function(g){var tr=document.createElement('tr');
+      [ymd(g.date),g.days+'日',ymd(g.exp),g.left+'日'].forEach(function(v,i){var td=document.createElement('td');td.textContent=v;if(i!==0&&i!==2)td.className='n';tr.appendChild(td);});tb.appendChild(tr);});
+    var ex=document.getElementById('expire');
+    if(!r.valid.length){ex.textContent='まだ有給をもらう前です。入社から6か月たつと10日もらえます（出勤率8割以上が条件）。';}
+    else{var o=r.valid[0];ex.textContent=o.left>0?(ymd(o.exp)+' に '+o.left+'日 が消えます。それまでに使うと無駄になりません。'):'いちばん古い分は使い切っています。消える有給はいまのところありません。';}
+    if(r.over>0)ex.textContent+=' ※入力した日数が、いま有効な日数より '+r.over+'日 多くなっています。';
+    document.getElementById('next').textContent='次は '+ymd(r.next)+' に '+r.nextDays+'日 もらえる予定です（出勤率8割以上が条件）。';
+    document.getElementById('res').classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>

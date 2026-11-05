@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://by8k98rff4-gif.github.io/shokuba-tools/sitemap.xml
