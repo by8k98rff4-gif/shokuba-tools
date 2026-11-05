@@ -44,3 +44,6 @@ h2{font-size:19px;margin:32px 0 8px}
 .list a{display:block;text-decoration:none;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 .list a b{display:block;color:var(--accent)}
 footer{margin-top:40px;font-size:13px;color:var(--muted)}
+.more{margin-bottom:14px;font-size:14px}
+.more summary{cursor:pointer;color:var(--accent);padding:6px 0}
+.more .field{margin-top:10px}

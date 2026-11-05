@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>傷病手当金 計算ツール｜1日いくら・合計いくらもらえるか</title>
+<meta name="description" content="月給と休む日数を入れるだけで、傷病手当金の1日あたりの金額と合計の目安がわかる無料ツール。協会けんぽの計算方法（令和8年時点）で、最初の3日間や休み中の給料も反映します。">
+<link rel="canonical" href="https://by8k98rff4-gif.github.io/shokuba-tools/shobyo/">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="../">職場の計算ツール</a> › 傷病手当金</div>
+  <h1>傷病手当金 計算ツール</h1>
+  <p class="lead">病気やケガでしばらく休むことになると、まず気になるのがお金のことですよね。月給と休む日数から、1日いくら、合計いくらになりそうかを出します。</p>
+
+  <div class="card">
+    <form id="f">
+      <div class="field">
+        <label for="pay">今の月給（総支給額）</label>
+        <span class="hint">残業代や通勤手当も含めた、手取りになる前の金額です。標準報酬月額がわかる人は、その金額を入れてください。</span>
+        <input id="pay" type="number" inputmode="numeric" min="1" step="1" placeholder="例：300000" required>
+      </div>
+      <div class="field">
+        <label for="term">健康保険に入ってからの期間</label>
+        <span class="hint">協会けんぽの加入が途切れず続いている期間です。支給が始まる日（休み始めて4日目のころ）で数えます。</span>
+        <select id="term">
+          <option value="full">12か月以上</option>
+          <option value="short">12か月未満</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="days">続けて休む日数</label>
+        <span class="hint">休み始めの日から数えた日数です。土日も、最初の3日間も含めます。</span>
+        <input id="days" type="number" inputmode="numeric" min="1" step="1" value="30" required>
+      </div>
+      <div class="field">
+        <label for="daily">休み中に会社から出る給料（1日あたり）</label>
+        <span class="hint">出ない人は0のままで大丈夫です。</span>
+        <input id="daily" type="number" inputmode="numeric" min="0" step="1" value="0">
+      </div>
+      <details class="more">
+        <summary>この12か月で月給が変わった人はこちら</summary>
+        <div class="field">
+          <label for="prev">変わる前の月給</label>
+          <input id="prev" type="number" inputmode="numeric" min="1" step="1" placeholder="例：260000">
+        </div>
+        <div class="field">
+          <label for="cur">今の月給になってからの月数</label>
+          <span class="hint">1〜11で入れてください。加入が12か月未満の人は、今の月給だけで計算します。</span>
+          <input id="cur" type="number" inputmode="numeric" min="1" max="11" step="1" placeholder="例：10">
+        </div>
+      </details>
+      <button class="calc" type="submit">計算する</button>
+    </form>
+
+    <div class="result" id="res" aria-live="polite">
+      <div class="note">受け取れる金額の合計（目安）</div>
+      <div class="big" id="total">0<small>円</small></div>
+      <div class="tblwrap">
+        <table class="rows">
+          <tbody>
+            <tr><th>傷病手当金の1日あたり</th><td class="n" id="rate"></td></tr>
+            <tr><th>実際に受け取る1日あたり</th><td class="n" id="perday"></td></tr>
+            <tr><th>対象になる日数</th><td class="n" id="paid"></td></tr>
+            <tr><th>計算に使った月額</th><td class="n" id="base"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert" id="msg"></div>
+      <div class="cta">お金の管理をExcelで整えたいときのテンプレートは、こちらでご案内しています。→ <a href="https://note.com/shokuba_tenpure" rel="noopener">職場のテンプレ係（note）</a></div>
+    </div>
+  </div>
+
+  <h2>計算のしかた</h2>
+  <p>1日あたりの金額は「支給が始まる日より前の12か月の標準報酬月額の平均 ÷ 30 × 2/3」です。÷30のところで10円未満を四捨五入して、× 2/3のあとで1円未満を四捨五入します。ざっくり言うと、お給料の3分の2くらいですね。</p>
+  <p>標準報酬月額というのは、月給を区切りのいい金額に当てはめた、保険料の計算用の数字です。たとえば月給が29万円以上31万円未満なら30万円になります。このツールは、入れてもらった月給を協会けんぽの表で標準報酬月額に置きかえて計算しています。実際の標準報酬月額は、毎年の決まった時期の給料をもとに決まるので、今の月給とずれていることもあります。</p>
+  <p>対象は仕事以外の病気やケガで働けないときで、もらえるのは続けて3日休んだあとの4日目からです。仕事中や通勤中のケガは労災のほうになります。休み中に給料が出ていて、その額が傷病手当金より少ないときは、差額を受け取れます。</p>
+  <p class="note">令和8年（2026年）時点の協会けんぽの計算方法にもとづく目安です。健康保険組合や共済に入っている人は、決まりが違うことがあるので加入先に確認してください。実際に受け取れるかどうかや金額は、申請のあとに保険者が決めます。年金や労災の給付を受けているときは、調整されることがあります。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>最初の3日間に有給を使っても大丈夫ですか？</dt>
+    <dd>大丈夫です。待期と呼ばれるこの3日間には、有給や土日・祝日などのお休みも含まれます。給料が出たかどうかは関係ありません。ただ、3日続けて休んでいないと待期にはならないので、間に出勤をはさむと数え直しになります。</dd>
+    <dt>いつまでもらえますか？</dt>
+    <dd>支給が始まった日から通算して1年6か月です。途中で復帰して、また同じ病気やケガで休んだときは、もらった期間を足していって1年6か月になるまで受け取れます。</dd>
+    <dt>入社して1年たっていなくても、もらえますか？</dt>
+    <dd>条件を満たせばもらえます。ただ、加入が12か月に届いていない場合は計算が少し変わって、「これまでの標準報酬月額の平均」と「32万円」の低いほうが使われます（支給開始日が令和7年4月1日以降の場合）。月給が高めの人は、そのぶん少なく出るかもしれません。</dd>
+  </dl>
+
+  <footer>
+    <p>このツールは入力した内容をどこにも送信しません。計算はお使いの端末の中だけで行われます。</p>
+    <p><a href="../">他の計算ツールを見る</a></p>
+  </footer>
+</div>
+<script>
+(function(){
+  // 健康保険の標準報酬月額（協会けんぽ 令和8年3月分からの保険料額表）。[この金額未満, 標準報酬月額]
+  var T=[[63000,58000],[73000,68000],[83000,78000],[93000,88000],[101000,98000],[107000,104000],[114000,110000],[122000,118000],[130000,126000],[138000,134000],[146000,142000],[155000,150000],[165000,160000],[175000,170000],[185000,180000],[195000,190000],[210000,200000],[230000,220000],[250000,240000],[270000,260000],[290000,280000],[310000,300000],[330000,320000],[350000,340000],[370000,360000],[395000,380000],[425000,410000],[455000,440000],[485000,470000],[515000,500000],[545000,530000],[575000,560000],[605000,590000],[635000,620000],[665000,650000],[695000,680000],[730000,710000],[770000,750000],[810000,790000],[855000,830000],[905000,880000],[955000,930000],[1005000,980000],[1055000,1030000],[1115000,1090000],[1175000,1150000],[1235000,1210000],[1295000,1270000],[1355000,1330000]];
+  var CAP=320000; // 加入12か月未満の上限（支給開始日が令和7年4月1日以降）
+  var WAIT=3;
+  function std(p){for(var i=0;i<T.length;i++){if(p<T[i][0])return T[i][1];}return 1390000;}
+  // o: {pay, under12, days, daily, prev, curMonths}
+  window.shobyoCalc=function(o){
+    var cur=std(o.pay),avg=cur,mixed=false;
+    if(o.under12){avg=Math.min(cur,CAP);}
+    else if(o.prev>0&&o.curMonths>=1&&o.curMonths<=11){
+      avg=(cur*o.curMonths+std(o.prev)*(12-o.curMonths))/12;mixed=true;
+    }
+    var perDay30=Math.round(avg/30/10)*10;          // 10円未満を四捨五入
+    var rate=Math.round(perDay30*2/3);              // 1円未満を四捨五入
+    var daily=Math.max(0,o.daily||0);
+    var perDay=Math.max(0,rate-daily);              // 給料が少ないときは差額
+    var paid=Math.max(0,(o.days||0)-WAIT);
+    return {std:cur,avg:avg,mixed:mixed,capped:!!o.under12&&cur>CAP,rate:rate,perDay:perDay,paidDays:paid,total:perDay*paid};
+  };
+  function yen(n){return Math.round(n).toLocaleString('ja-JP')+'円';}
+  function num(id){return parseFloat(document.getElementById(id).value)||0;}
+  document.getElementById('f').addEventListener('submit',function(e){
+    e.preventDefault();
+    var under=document.getElementById('term').value==='short';
+    var r=shobyoCalc({pay:num('pay'),under12:under,days:Math.floor(num('days')),daily:num('daily'),prev:num('prev'),curMonths:Math.floor(num('cur'))});
+    document.getElementById('total').innerHTML=r.total.toLocaleString('ja-JP')+'<small>円</small>';
+    document.getElementById('rate').textContent=yen(r.rate);
+    document.getElementById('perday').textContent=yen(r.perDay);
+    document.getElementById('paid').textContent=r.paidDays+'日';
+    document.getElementById('base').textContent=yen(r.avg);
+    var m=[];
+    if(r.paidDays===0)m.push('続けて3日休んだあとの4日目から対象になるので、この日数だとまだ受け取れません。');
+    else if(r.perDay===0)m.push('休み中の給料が傷病手当金より多いので、差額は出ません。');
+    else if(num('daily')>0)m.push('休み中の給料との差額で計算しました。');
+    else m.push('最初の3日間を除いた '+r.paidDays+'日分で計算しました。');
+    if(r.capped)m.push('加入が12か月未満なので、計算に使う月額は32万円までになります。');
+    if(under&&num('prev')>0)m.push('加入が12か月未満なので、今の月給だけで計算しています。');
+    if(!under&&num('prev')>0&&!r.mixed)m.push('月給が変わった人の欄は、月数が1〜11のときだけ計算に入れています。');
+    document.getElementById('msg').textContent=m.join(' ');
+    document.getElementById('res').classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>
