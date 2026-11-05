@@ -19,3 +19,6 @@
 
 ## 公開
 `git add -A && git commit -m "..." && git push origin main` で数分後に反映。
+
+## Google Search Console
+`index.html` の google-site-verification の meta タグは消さないこと（消すと所有権の確認が外れる）。
