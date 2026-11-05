@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>残業代 計算ツール｜月給から今月の残業代と1時間あたりの金額がわかる</title>
+<meta name="description" content="月給と年間休日、残業した時間を入れるだけで、残業代の目安がわかる無料ツール。月60時間超・深夜・法定休日の割増も、令和8年時点の労働基準法のルールで計算します。">
+<link rel="canonical" href="https://by8k98rff4-gif.github.io/shokuba-tools/zangyo/">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="../">職場の計算ツール</a> › 残業代</div>
+  <h1>残業代 計算ツール</h1>
+  <p class="lead">給与明細の残業代、これで合ってるのかな？と思ったときに。月給と残業した時間から、法律どおりに計算した金額の目安を出します。</p>
+
+  <div class="card">
+    <form id="f">
+      <div class="field">
+        <label for="pay">月給（基本給＋手当）</label>
+        <span class="hint">家族手当・通勤手当・住宅手当などは除いて入れてください。すでに残業代として出ている分も除きます。</span>
+        <input id="pay" type="number" inputmode="numeric" min="1" step="1" placeholder="例：250000" required>
+      </div>
+      <div class="field">
+        <label for="off">会社の年間休日</label>
+        <span class="hint">求人票や就業規則に書いてある日数です。わからなければ、カレンダーの休みを数えてみてください。</span>
+        <input id="off" type="number" inputmode="numeric" min="0" max="364" step="1" value="120" required>
+      </div>
+      <div class="field">
+        <label for="ot">今月の残業時間</label>
+        <span class="hint">1日8時間・週40時間を超えて働いた時間です。1時間30分なら1.5。法定休日に働いた分は入れません。</span>
+        <input id="ot" type="number" inputmode="decimal" min="0" step="0.5" value="0">
+      </div>
+      <div class="field">
+        <label for="night">そのうち深夜の時間</label>
+        <span class="hint">夜10時から朝5時までに働いた時間です。</span>
+        <input id="night" type="number" inputmode="decimal" min="0" step="0.5" value="0">
+      </div>
+      <div class="field">
+        <label for="hol">法定休日に働いた時間</label>
+        <span class="hint">週1日（または4週で4日）の、法律で決まった休日です。どの日かは就業規則で確かめられます。</span>
+        <input id="hol" type="number" inputmode="decimal" min="0" step="0.5" value="0">
+      </div>
+      <details class="more">
+        <summary>1日の勤務が8時間ではない人はこちら</summary>
+        <div class="field">
+          <label for="daily">1日の所定労働時間</label>
+          <span class="hint">7時間30分なら7.5です。</span>
+          <input id="daily" type="number" inputmode="decimal" min="0.5" max="24" step="0.25" value="8">
+        </div>
+      </details>
+      <button class="calc" type="submit">計算する</button>
+    </form>
+
+    <div class="result" id="res" aria-live="polite">
+      <div class="note">今月の残業代（目安）</div>
+      <div class="big" id="total">0<small>円</small></div>
+      <div class="tblwrap">
+        <table class="rows">
+          <tbody>
+            <tr><th>残業（60時間まで）× 1.25</th><td class="n" id="a"></td></tr>
+            <tr><th>残業（60時間を超えた分）× 1.5</th><td class="n" id="b"></td></tr>
+            <tr><th>法定休日 × 1.35</th><td class="n" id="c"></td></tr>
+            <tr><th>深夜の上乗せ × 0.25</th><td class="n" id="d"></td></tr>
+            <tr><th>1時間あたりの賃金</th><td class="n" id="hr"></td></tr>
+            <tr><th>月平均の所定労働時間</th><td class="n" id="avg"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert" id="msg"></div>
+      <div class="cta">毎月の残業時間をExcelで記録したいときのテンプレートは、こちらでご案内しています。→ <a href="https://note.com/shokuba_tenpure" rel="noopener">職場のテンプレ係（note）</a></div>
+    </div>
+  </div>
+
+  <h2>計算のしかた</h2>
+  <p>まず1時間あたりの賃金を出します。月によって働く時間が違うので、1年をならした「月平均の所定労働時間」を使います。式にすると「（365日 − 年間休日）× 1日の所定労働時間 ÷ 12」で、これで月給を割ったものが1時間あたりの賃金です。</p>
+  <p>あとは、その金額に割増率と時間をかけるだけ。残業は1.25倍、月60時間を超えた分は1.5倍、法定休日は1.35倍です。深夜の時間には0.25倍ぶんが上乗せされるので、残業が深夜におよぶと1.5倍、60時間超なら1.75倍、法定休日なら1.6倍になります。金額は項目ごとに、1円未満を四捨五入しています。</p>
+  <p>月60時間の数え方には、法定休日に働いた時間は入りません。土曜出勤のように法定休日ではない休日の仕事は、週40時間を超えた分を残業のほうに入れてください。</p>
+  <p class="note">令和8年（2026年）時点の労働基準法にもとづく、法律で決まった最低ラインの計算です。会社の決まりでこれより高い率になっていることもあります。うるう年は366日で計算する会社もあるので、少しずれることがあります。正確な金額は、就業規則か給与の担当に確認してください。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>固定残業代（みなし残業）がある場合はどうなりますか？</dt>
+    <dd>実際の残業で計算した金額が、固定で出ている手当より多いときは、差額をもらえることになっています。このツールで出た金額と手当を見くらべてみてください。その場合、月給の欄に固定残業代は入れないでください。</dd>
+    <dt>管理職だと残業代は出ないのですか？</dt>
+    <dd>労働基準法の「管理監督者」にあたる人は、残業と休日の割増の対象から外れます。ただ、深夜の割増は別で、管理監督者でも対象です。自分があてはまるかどうかは、会社に確認してみてください。</dd>
+    <dt>残業は15分単位で切り捨てられていますが、問題ないですか？</dt>
+    <dd>毎日の残業時間を切り捨てることは認められていません。認められているのは、1か月の合計に出た端数の扱いで、30分未満を切り捨てて、30分以上を1時間に切り上げるやり方です。</dd>
+  </dl>
+
+  <footer>
+    <p>このツールは入力した内容をどこにも送信しません。計算はお使いの端末の中だけで行われます。</p>
+    <p><a href="../">他の計算ツールを見る</a></p>
+  </footer>
+</div>
+<script>
+(function(){
+  // 割増率（労働基準法37条・令和8年時点）
+  var R={ot:1.25,over:1.5,hol:1.35,night:0.25},LIMIT=60;
+  // o: {pay, off, daily, ot, night, hol}
+  window.zangyoCalc=function(o){
+    var daily=o.daily||8;
+    var avg=(365-o.off)*daily/12;          // 月平均の所定労働時間
+    var hr=o.pay/avg;                      // 1時間あたりの賃金
+    var ot=Math.max(0,o.ot||0),night=Math.max(0,o.night||0),hol=Math.max(0,o.hol||0);
+    var within=Math.min(ot,LIMIT),over=Math.max(0,ot-LIMIT);
+    var a=Math.round(hr*within*R.ot),b=Math.round(hr*over*R.over);
+    var c=Math.round(hr*hol*R.hol),d=Math.round(hr*night*R.night);
+    return {avg:avg,hourly:hr,within:within,over:over,a:a,b:b,c:c,d:d,total:a+b+c+d};
+  };
+  function yen(n){return Math.round(n).toLocaleString('ja-JP')+'円';}
+  function num(id){return parseFloat(document.getElementById(id).value)||0;}
+  document.getElementById('f').addEventListener('submit',function(e){
+    e.preventDefault();
+    var o={pay:num('pay'),off:num('off'),daily:num('daily')||8,ot:num('ot'),night:num('night'),hol:num('hol')};
+    var r=zangyoCalc(o);
+    document.getElementById('total').innerHTML=r.total.toLocaleString('ja-JP')+'<small>円</small>';
+    document.getElementById('a').textContent=yen(r.a);
+    document.getElementById('b').textContent=yen(r.b);
+    document.getElementById('c').textContent=yen(r.c);
+    document.getElementById('d').textContent=yen(r.d);
+    document.getElementById('hr').textContent=yen(r.hourly);
+    document.getElementById('avg').textContent=(Math.round(r.avg*10)/10)+'時間';
+    var m=[];
+    if(r.total===0)m.push('残業の時間が0なので、残業代も0円になります。');
+    if(r.over>0)m.push('60時間を超えた '+r.over+'時間は、1.5倍で計算しました。');
+    if(o.night>o.ot+o.hol)m.push('深夜の時間が残業と法定休日の合計より長くなっています。所定の勤務時間内の深夜なら、上乗せの0.25倍だけがつきます。');
+    var box=document.getElementById('msg');
+    box.textContent=m.join(' ');box.style.display=m.length?'':'none';
+    document.getElementById('res').classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>
