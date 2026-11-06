@@ -22,3 +22,8 @@
 
 ## Google Search Console
 `index.html` の google-site-verification の meta タグは消さないこと（消すと所有権の確認が外れる）。
+
+## 無料テンプレの配布
+- 無料テンプレの .xlsx は `files/<英数字名>.xlsx` に置く（例: files/yukyu-check-free.xlsx）
+- ダウンロードURL: https://by8k98rff4-gif.github.io/shokuba-tools/files/<名前>.xlsx （noteの無料記事にこのURLを貼る）
+- 有料テンプレはここに置かない（リポジトリが公開なので誰でも取れてしまう）
