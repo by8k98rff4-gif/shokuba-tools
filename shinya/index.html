@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>深夜手当 計算ツール｜時給と出勤・退勤の時刻で1日分の給料がわかる</title>
+<meta name="description" content="時給と出勤・退勤・休憩の時刻を入れるだけで、夜10時から朝5時までの深夜手当と、8時間を超えた分の割増を入れた1日の給料の目安がわかる無料ツール。日付をまたぐシフトにも対応。令和8年時点の労働基準法で計算します。">
+<link rel="canonical" href="https://by8k98rff4-gif.github.io/shokuba-tools/shinya/">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="../">職場の計算ツール</a> › 深夜手当</div>
+  <h1>深夜手当 計算ツール</h1>
+  <p class="lead">夜のシフトに入った日、深夜の分ってちゃんと上乗せされてるのかな？と気になったときに。時給と時刻を入れると、その日の給料の目安が出ます。</p>
+
+  <div class="card">
+    <form id="f">
+      <div class="field">
+        <label for="wage">時給</label>
+        <span class="hint">交通費などの手当は入れません。月給の人は「残業代 計算ツール」のほうが合っています。</span>
+        <input id="wage" type="number" inputmode="numeric" min="1" step="1" placeholder="例：1200" required>
+      </div>
+      <div class="field">
+        <label for="start">出勤の時刻</label>
+        <input id="start" type="time" value="18:00" required>
+      </div>
+      <div class="field">
+        <label for="end">退勤の時刻</label>
+        <span class="hint">朝の2時に上がるなら 02:00 のように入れてください。日付をまたいだ分は自動で翌日として数えます。</span>
+        <input id="end" type="time" value="23:00" required>
+      </div>
+      <div class="field">
+        <label for="bstart">休憩に入った時刻</label>
+        <span class="hint">休憩がなかった日は空欄のままで大丈夫です。</span>
+        <input id="bstart" type="time">
+      </div>
+      <div class="field">
+        <label for="bmin">休憩の長さ（分）</label>
+        <input id="bmin" type="number" inputmode="numeric" min="0" step="5" value="0">
+      </div>
+      <button class="calc" type="submit">計算する</button>
+    </form>
+
+    <div class="result" id="res" aria-live="polite">
+      <div class="note">この日の給料（目安）</div>
+      <div class="big" id="total">0<small>円</small></div>
+      <div class="tblwrap">
+        <table class="rows">
+          <tbody>
+            <tr><th>働いた時間（休憩をのぞく）</th><td class="n" id="work"></td></tr>
+            <tr><th>そのうち深夜（22時〜5時）</th><td class="n" id="night"></td></tr>
+            <tr><th>そのうち8時間を超えた分</th><td class="n" id="ot"></td></tr>
+            <tr><th>時給 × 働いた時間</th><td class="n" id="a"></td></tr>
+            <tr><th>深夜手当（時給 × 0.25）</th><td class="n" id="b"></td></tr>
+            <tr><th>8時間を超えた分の割増（時給 × 0.25）</th><td class="n" id="c"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert" id="msg"></div>
+      <div class="cta">シフトや働いた時間をExcelで記録したいときのテンプレートは、こちらでご案内しています。→ <a href="https://note.com/shokuba_tenpure" rel="noopener">職場のテンプレ係（note）</a></div>
+    </div>
+  </div>
+
+  <h2>計算のしかた</h2>
+  <p>夜10時から朝5時までに働いた時間は「深夜」になり、時給の0.25倍ぶんが上乗せされます。つまり深夜の1時間は、時給の1.25倍です。休憩はお給料が出ない時間なので、休憩が深夜の時間帯にかかっていれば、その分は深夜の時間からも引いています。</p>
+  <p>もうひとつ、1日に8時間を超えて働いた分は時間外になり、こちらも0.25倍が上乗せされます。時間外の時間がちょうど深夜に入っていると、両方が重なって1.5倍です。たとえば時給1,100円で13時から24時まで（休憩1時間）なら、8時間ぶんの8,800円に、22時からの2時間 × 1,650円の3,300円を足して12,100円になります。</p>
+  <p>金額は項目ごとに1円未満を四捨五入しています。1日の中だけで計算しているので、週40時間を超えた分の時間外は入っていません。</p>
+  <p class="note">令和8年（2026年）時点の労働基準法（37条の割増賃金、34条の休憩）にもとづく、法律で決まった最低ラインの目安です。会社の決まりでこれより高い率のこともあります。正確な金額は、就業規則や給与の担当に確認してください。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>深夜手当は、パートやアルバイトでもつきますか？</dt>
+    <dd>つきます。夜10時から朝5時までに働いた時間には、雇われ方に関係なく0.25倍以上の上乗せがあります。時給の中に深夜の分がふくまれている、と言われた場合は、雇用契約書や求人票にそう書いてあるかを見てみてください。</dd>
+    <dt>休憩が足りていない気がします。決まりはありますか？</dt>
+    <dd>働く時間が6時間を超えるなら少なくとも45分、8時間を超えるなら少なくとも1時間の休憩が必要です。このツールでも、休憩が短いときは結果の下にお知らせを出しています。</dd>
+    <dt>管理職でも深夜手当はつきますか？</dt>
+    <dd>労働基準法の「管理監督者」にあたる人は残業代の対象から外れますが、深夜の割増は対象のままです。肩書きだけでは決まらないので、気になるときは会社に確認してみてください。</dd>
+  </dl>
+
+  <footer>
+    <p>このツールは入力した内容をどこにも送信しません。計算はお使いの端末の中だけで行われます。</p>
+    <p><a href="../">他の計算ツールを見る</a></p>
+  </footer>
+</div>
+<script>
+(function(){
+  // 割増率（労働基準法37条・施行規則20条、令和8年時点）
+  var NIGHT=0.25,OT=0.25,DAY=480; // 1日8時間＝480分
+  function toMin(s){
+    if(!s)return null;var p=String(s).split(':');
+    var h=parseInt(p[0],10),m=parseInt(p[1],10);
+    if(isNaN(h)||isNaN(m))return null;return h*60+m;
+  }
+  function isNight(abs){var c=((abs%1440)+1440)%1440;return c<300||c>=1320;}
+  // o: {wage, start:"HH:MM", end:"HH:MM", bstart:"HH:MM"|"" , bmin}
+  window.shinyaCalc=function(o){
+    var s=toMin(o.start),e=toMin(o.end);
+    var dur=e-s;if(dur<=0)dur+=1440;      // 日付をまたぐ
+    var bmin=Math.max(0,Math.round(o.bmin||0)),bs=toMin(o.bstart),bOut=0;
+    if(bs===null||bmin===0){bmin=0;bs=s;}
+    else{bs=bs-s;if(bs<0)bs+=1440;}       // 出勤からの経過分
+    var work=0,night=0,ot=0,otNight=0,brk=0;
+    for(var t=0;t<dur;t++){
+      if(bmin>0&&t>=bs&&t<bs+bmin){brk++;continue;}
+      work++;var n=isNight(s+t);
+      if(n)night++;
+      if(work>DAY){ot++;if(n)otNight++;}
+    }
+    if(bmin>0)bOut=bmin-brk;              // 勤務時間の外にはみ出した休憩
+    var w=o.wage;
+    var a=Math.round(w*work/60),b=Math.round(w*NIGHT*night/60),c=Math.round(w*OT*ot/60);
+    return {span:dur,work:work,night:night,ot:ot,otNight:otNight,brk:brk,breakOutside:bOut,a:a,b:b,c:c,total:a+b+c};
+  };
+  function hm(m){var h=Math.floor(m/60),r=m%60;return h+'時間'+(r?r+'分':'');}
+  function yen(n){return n.toLocaleString('ja-JP')+'円';}
+  document.getElementById('f').addEventListener('submit',function(e){
+    e.preventDefault();
+    var o={wage:parseFloat(document.getElementById('wage').value)||0,
+      start:document.getElementById('start').value,end:document.getElementById('end').value,
+      bstart:document.getElementById('bstart').value,bmin:parseFloat(document.getElementById('bmin').value)||0};
+    if(!o.start||!o.end)return;
+    var r=shinyaCalc(o);
+    document.getElementById('total').innerHTML=r.total.toLocaleString('ja-JP')+'<small>円</small>';
+    document.getElementById('work').textContent=hm(r.work);
+    document.getElementById('night').textContent=hm(r.night);
+    document.getElementById('ot').textContent=hm(r.ot);
+    document.getElementById('a').textContent=yen(r.a);
+    document.getElementById('b').textContent=yen(r.b);
+    document.getElementById('c').textContent=yen(r.c);
+    var m=[];
+    if(r.night===0)m.push('夜10時から朝5時にかかる時間がないので、深夜手当はつきません。');
+    if(r.otNight>0)m.push('8時間を超えた分のうち '+hm(r.otNight)+' は深夜と重なっているので、1.5倍になっています。');
+    if(r.breakOutside>0)m.push('休憩の一部が勤務の時間の外にはみ出しています。時刻を見直してみてください。');
+    if(r.work>480&&r.brk<60)m.push('8時間を超えて働く日は、休憩が少なくとも1時間いることになっています。');
+    else if(r.work>360&&r.brk<45)m.push('6時間を超えて働く日は、休憩が少なくとも45分いることになっています。');
+    var box=document.getElementById('msg');
+    box.textContent=m.join(' ');box.style.display=m.length?'':'none';
+    document.getElementById('res').classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>
