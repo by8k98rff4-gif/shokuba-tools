@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>パートの給料 計算ツール｜時給と出勤日数で今月いくらになるかわかる</title>
+<meta name="description" content="時給・1日の勤務時間・月の出勤日数を入れるだけで、パートやアルバイトの1か月の給料（額面）の目安がわかる無料ツール。夜10時以降の深夜手当や、1日8時間・週40時間を超えた分の割増も入れて計算します。令和8年時点の労働基準法にもとづく目安です。">
+<link rel="canonical" href="https://by8k98rff4-gif.github.io/shokuba-tools/part/">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="../">職場の計算ツール</a> › パートの給料</div>
+  <h1>パートの給料 計算ツール</h1>
+  <p class="lead">シフト表を見ながら、今月っていくらくらいになるんだろう…と思ったときに。時給と日数を入れると、1か月の給料の目安が出ます。</p>
+
+  <div class="card">
+    <form id="f">
+      <div class="field">
+        <label for="wage">時給</label>
+        <input id="wage" type="number" inputmode="numeric" min="1" step="1" placeholder="例：1100" required>
+      </div>
+      <div class="field">
+        <label for="hours">1日に働く時間（休憩をのぞく）</label>
+        <span class="hint">日によってばらつくときは、だいたいの平均で大丈夫です。4時間30分なら 4.5 です。</span>
+        <input id="hours" type="number" inputmode="decimal" min="0.25" max="24" step="0.25" placeholder="例：5" required>
+      </div>
+      <div class="field">
+        <label for="days">1か月の出勤日数</label>
+        <input id="days" type="number" inputmode="numeric" min="1" max="31" step="1" placeholder="例：20" required>
+      </div>
+      <div class="field">
+        <label for="wdays">1週間の出勤日数</label>
+        <span class="hint">週40時間を超えたかどうかを見るのに使います。</span>
+        <input id="wdays" type="number" inputmode="numeric" min="1" max="7" step="1" value="5" required>
+      </div>
+      <div class="field">
+        <label for="night">そのうち夜10時〜朝5時に働いた時間（1か月の合計）</label>
+        <span class="hint">夜のシフトがなければ 0 のままで大丈夫です。</span>
+        <input id="night" type="number" inputmode="decimal" min="0" step="0.25" value="0">
+      </div>
+      <button class="calc" type="submit">計算する</button>
+    </form>
+
+    <div class="result" id="res" aria-live="polite">
+      <div class="note">今月の給料（額面・目安）</div>
+      <div class="big" id="total">0<small>円</small></div>
+      <div class="tblwrap">
+        <table class="rows">
+          <tbody>
+            <tr><th>働いた時間（1か月）</th><td class="n" id="work"></td></tr>
+            <tr><th>時給 × 働いた時間</th><td class="n" id="a"></td></tr>
+            <tr><th>深夜手当（時給 × 0.25）</th><td class="n" id="b"></td></tr>
+            <tr><th>時間外の割増（時給 × 0.25）</th><td class="n" id="c"></td></tr>
+            <tr><th>この月が12か月続いたときの年収</th><td class="n" id="y"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert" id="msg"></div>
+      <div class="cta">シフトを1日ずつ入れると月の見込みが出るExcelを、無料で配っています。→ <a href="https://note.com/shokuba_tenpure/n/n25194884c9ef" rel="noopener">パートの給料見込みシート（無料・note）</a></div>
+    </div>
+  </div>
+
+  <h2>計算のしかた</h2>
+  <p>基本は「時給 × 働いた時間」です。1日5時間で月20日なら100時間なので、時給1,100円なら110,000円になります。</p>
+  <p>そこに上乗せが2つあります。ひとつは夜10時から朝5時までの深夜で、時給の0.25倍ぶん。もうひとつは1日8時間、または1週間40時間を超えた時間外で、こちらも0.25倍です（1か月60時間を超えた分は0.5倍）。たとえば1日8時間を週6日だと、週48時間なので8時間ぶんが時間外になります。</p>
+  <p>金額は項目ごとに1円未満を四捨五入しています。交通費や手当、税金・社会保険料はここには入っていないので、振り込まれる手取りはこれより少なくなることが多いです。年収は今月のペースが1年続いた場合のかんたんな見込みです。</p>
+  <p class="note">令和8年（2026年）時点の労働基準法（32条の労働時間、37条の割増賃金）にもとづく、法律で決まった最低ラインの目安です。会社の決まりでこれより高い率のこともあります。正確な金額は、雇用契約書や給与の担当に確認してください。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>パートでも残業代の割増はつきますか？</dt>
+    <dd>つきます。1日8時間か週40時間を超えた分は、パートやアルバイトでも0.25倍以上の上乗せがあります。ただ、契約が1日5時間で6時間働いた、というような「8時間以内の残業」は、法律上は割増なしの時給ぶんでもよいことになっています。</dd>
+    <dt>給料日に振り込まれる額と合いません。</dt>
+    <dd>ここで出るのは税金などを引く前の額面です。所得税や、加入していれば社会保険料・雇用保険料が引かれます。交通費が出る人は、その分は逆に増えますね。明細の「総支給額」と比べてみると近い数字になっているはずです。</dd>
+    <dt>月によって出勤日数がちがうときは？</dt>
+    <dd>シフトが決まっている月ごとに日数を入れ直してみてください。年収の欄は「この月がずっと続いたら」という見込みなので、日数の多い月で見ると大きめに出ます。1年分をちゃんと見たいときは、下のExcel版のほうが向いています。</dd>
+  </dl>
+
+  <div class="cta" style="margin-top:28px">1か月ずつではなく1年分を見ておきたいときは、Excel版が便利です。シフトを入れるだけで12か月分の給料と、年間の目安額までの残りがわかります。Excel版はテンプレ係で配っています（<a href="https://note.com/shokuba_tenpure/n/n25194884c9ef" rel="noopener">1か月分の無料版</a>／<a href="https://note.com/shokuba_tenpure/n/na52431ea7c0c" rel="noopener">12か月分・グラフ付きの有料版 980円</a>）。</div>
+
+  <footer>
+    <p>このツールは入力した内容をどこにも送信しません。計算はお使いの端末の中だけで行われます。</p>
+    <p><a href="../">他の計算ツールを見る</a></p>
+  </footer>
+</div>
+<script>
+(function(){
+  // 労働基準法32条（1日8時間・週40時間）、37条・割増賃金令（時間外0.25、60時間超0.5、深夜0.25）令和8年時点
+  var OT=0.25,OT60=0.5,NIGHT=0.25,DAYH=8,WEEKH=40,LIM60=60;
+  // o: {wage, hours(1日), days(月), wdays(週), night(月の深夜時間)}
+  window.partCalc=function(o){
+    var w=o.wage,h=o.hours,d=o.days,wd=Math.min(Math.max(1,o.wdays),7);
+    if(wd>d)wd=d;
+    var work=h*d;
+    var night=Math.min(Math.max(0,o.night||0),work);
+    var dayOT=Math.max(0,h-DAYH)*d;                       // 1日8時間を超えた分
+    var weekOT=Math.max(0,Math.min(h,DAYH)*wd-WEEKH)*(d/wd); // 8時間内の分で週40時間を超えた分
+    var ot=dayOT+weekOT;
+    var a=Math.round(w*work);
+    var b=Math.round(w*NIGHT*night);
+    var c=Math.round(w*OT*Math.min(ot,LIM60)+w*OT60*Math.max(0,ot-LIM60));
+    var total=a+b+c;
+    return {work:work,night:night,ot:ot,a:a,b:b,c:c,total:total,year:total*12};
+  };
+  function hm(x){var m=Math.round(x*60),h=Math.floor(m/60),r=m%60;return h+'時間'+(r?r+'分':'');}
+  function yen(n){return n.toLocaleString('ja-JP')+'円';}
+  function num(id){return parseFloat(document.getElementById(id).value);}
+  document.getElementById('f').addEventListener('submit',function(e){
+    e.preventDefault();
+    var o={wage:num('wage'),hours:num('hours'),days:num('days'),wdays:num('wdays'),night:num('night')||0};
+    if(!(o.wage>0&&o.hours>0&&o.days>0&&o.wdays>0))return;
+    var r=partCalc(o);
+    document.getElementById('total').innerHTML=r.total.toLocaleString('ja-JP')+'<small>円</small>';
+    document.getElementById('work').textContent=hm(r.work);
+    document.getElementById('a').textContent=yen(r.a);
+    document.getElementById('b').textContent=yen(r.b);
+    document.getElementById('c').textContent=r.ot>0?yen(r.c)+'（'+hm(r.ot)+'ぶん）':yen(0);
+    document.getElementById('y').textContent=yen(r.year);
+    var m=[];
+    if(o.wdays>o.days)m.push('週の出勤日数が月の日数より多かったので、月の日数に合わせて計算しました。');
+    if(o.night>r.work)m.push('深夜の時間が働いた時間より長かったので、働いた時間までで計算しました。');
+    if(r.ot>60)m.push('時間外が月60時間を超えています。超えた分は0.5倍で計算しました。');
+    var box=document.getElementById('msg');
+    box.textContent=m.join(' ');box.style.display=m.length?'':'none';
+    document.getElementById('res').classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>
