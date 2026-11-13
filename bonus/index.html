@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ボーナスの手取り 計算ツール｜額面と前月の給与で、振り込まれる額の目安がわかる</title>
+<meta name="description" content="ボーナスの額面・前月の給与・扶養の人数を入れるだけで、健康保険・厚生年金・雇用保険・所得税を引いた手取りの目安がわかる無料ツール。令和8年（2026年）の協会けんぽの保険料率（都道府県別）、子ども・子育て支援金、国税庁の賞与の源泉徴収税率表にもとづいて計算します。">
+<link rel="canonical" href="https://by8k98rff4-gif.github.io/shokuba-tools/bonus/">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="../">職場の計算ツール</a> › ボーナスの手取り</div>
+  <h1>ボーナスの手取り 計算ツール</h1>
+  <p class="lead">ボーナスの額は聞いたけど、実際いくら振り込まれるんだろう…というときに。額面と前月の給与を入れると、引かれる額と手取りの目安が出ます。</p>
+
+  <div class="card">
+    <form id="f">
+      <div class="field">
+        <label for="bonus">ボーナスの額面（総支給額）</label>
+        <input id="bonus" type="number" inputmode="numeric" min="1" step="1" placeholder="例：500000" required>
+      </div>
+      <div class="field">
+        <label for="prev">前月の給与から社会保険料を引いた額</label>
+        <span class="hint">前月の明細の「総支給額」から、健康保険・厚生年金・雇用保険を引いた額です。所得税の率を決めるのに使います。通勤手当は入れなくて大丈夫です。</span>
+        <input id="prev" type="number" inputmode="numeric" min="0" step="1" placeholder="例：250000" required>
+      </div>
+      <div class="field">
+        <label for="dep">扶養している家族の人数</label>
+        <span class="hint">年末調整の「扶養控除等申告書」に書いた人数です。ひとりなら 0 人。</span>
+        <select id="dep">
+          <option value="0">0人</option><option value="1">1人</option><option value="2">2人</option><option value="3">3人</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="age">年齢</label>
+        <span class="hint">40〜64歳の人は、介護保険料も一緒に引かれます。</span>
+        <select id="age">
+          <option value="0">39歳以下、または65歳以上</option>
+          <option value="1">40〜64歳</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="pref">会社のある都道府県（協会けんぽの場合）</label>
+        <span class="hint">健康保険料の率が都道府県ごとに少しずつちがいます。健康保険組合に入っている人は、近い県を選べば目安になります。</span>
+        <select id="pref"></select>
+      </div>
+      <button class="calc" type="submit">計算する</button>
+    </form>
+
+    <div class="result" id="res" aria-live="polite">
+      <div class="note" id="biglabel">ボーナスの手取り（目安）</div>
+      <div class="big" id="net">0<small>円</small></div>
+      <div class="tblwrap">
+        <table class="rows">
+          <tbody>
+            <tr><th>健康保険料<span id="kaigo"></span></th><td class="n" id="h"></td></tr>
+            <tr><th>子ども・子育て支援金</th><td class="n" id="k"></td></tr>
+            <tr><th>厚生年金保険料</th><td class="n" id="p"></td></tr>
+            <tr><th>雇用保険料</th><td class="n" id="e"></td></tr>
+            <tr><th>所得税</th><td class="n" id="t"></td></tr>
+            <tr><th>引かれる額の合計</th><td class="n" id="sum"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert" id="msg"></div>
+      <div class="cta">夏と冬のボーナスや前月の給与を、明細と見比べながら残しておきたいときは、Excelのほうが楽だったりします。Excel版はテンプレ係のnoteで配っています。→ <a href="https://note.com/shokuba_tenpure" rel="noopener">職場のテンプレ係（note）</a></div>
+    </div>
+  </div>
+
+  <h2>計算のしかた</h2>
+  <p>ボーナスから引かれるのは、健康保険料（40〜64歳は介護保険料も）、子ども・子育て支援金、厚生年金保険料、雇用保険料、所得税の5つです。住民税はボーナスからは引かれません。</p>
+  <p>社会保険料は、額面の1,000円未満を切り捨てた「標準賞与額」に率をかけて、本人が半分を負担します。令和8年度の率は、健康保険が都道府県ごと（東京都なら9.85%）、介護保険が1.62%、子ども・子育て支援金が0.23%、厚生年金が18.3%です。厚生年金は1回150万円まで、健康保険と支援金は4月からの累計573万円までが上限になります。雇用保険は額面そのものに0.5%です。</p>
+  <p>所得税は少しクセがあって、ボーナスの額ではなく「前月の給与から社会保険料を引いた額」と扶養の人数で率が決まります。たとえば前月が25万円で扶養0人なら4.084%。この率を、ボーナスから社会保険料を引いた額にかけます。</p>
+  <p>例：額面50万円・前月25万円・扶養0人・39歳以下・東京都なら、社会保険料の合計が73,450円、所得税が17,420円で、手取りは409,130円です。</p>
+  <p class="note">令和8年（2026年）時点の協会けんぽの保険料率（令和8年3月分から、支援金は4月分から）、雇用保険料率（令和8年度・一般の事業）、国税庁「令和8年分 源泉徴収税額表」の賞与の算出率の表（甲欄）にもとづく目安です。1円未満の端数は、社会保険料は50銭以下切り捨て・50銭超切り上げ、所得税は切り捨てで計算しています。会社の計算のしかたで数円ずれることがあるので、正式な金額は明細で確認してください。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>ボーナスから住民税は引かれないんですか？</dt>
+    <dd>会社員の住民税は、毎月の給与から12回（6月〜翌5月）に分けて引かれるしくみなので、ボーナスからは引かれないのがふつうです。そのぶん、ボーナスの手取りは給与より少し高めの割合になりやすいですね。</dd>
+    <dt>前月の給与が0円だったときや、ボーナスがとても多いときは？</dt>
+    <dd>前月に給与がなかったときや、ボーナスが前月の給与の10倍を超えるときは、所得税の出し方が別のやり方（月額表を使う計算）になります。このツールではその場合の所得税は出さず、社会保険料だけを引いた額を表示します。</dd>
+    <dt>明細の金額と少しちがいます。</dt>
+    <dd>健康保険組合に入っている会社だと、保険料率が協会けんぽとちがうことがあります。ほかにも、端数の処理を会社で決めていたり、扶養の人数の数え方（障害者控除などで1人増える）がちがったりすると、数円〜数千円ずれます。明細の保険料の欄と見比べると、どこがちがうかわかりやすいかもしれません。</dd>
+  </dl>
+
+  <div class="cta" style="margin-top:28px">ボーナスや毎月の給与の記録をExcelで残しておきたいときは、テンプレ係のnoteにテンプレを置いています。入力するところが黄色になっていて、計算は自動です。→ <a href="https://note.com/shokuba_tenpure" rel="noopener">職場のテンプレ係（note）</a></div>
+
+  <footer>
+    <p>このツールは入力した内容をどこにも送信しません。計算はお使いの端末の中だけで行われます。</p>
+    <p><a href="../">他の計算ツールを見る</a></p>
+  </footer>
+</div>
+<script>
+(function(){
+  // 協会けんぽ 令和8年度 健康保険料率（%×100、令和8年3月分から）。介護1.62%、子ども・子育て支援金0.23%（4月分から）、厚生年金18.300%
+  var PREF=[["北海道",1028],["青森県",985],["岩手県",951],["宮城県",1010],["秋田県",1001],["山形県",975],["福島県",950],["茨城県",952],["栃木県",982],["群馬県",968],["埼玉県",967],["千葉県",973],["東京都",985],["神奈川県",992],["新潟県",921],["富山県",959],["石川県",970],["福井県",971],["山梨県",955],["長野県",963],["岐阜県",980],["静岡県",961],["愛知県",993],["三重県",977],["滋賀県",988],["京都府",989],["大阪府",1013],["兵庫県",1012],["奈良県",991],["和歌山県",1006],["鳥取県",986],["島根県",994],["岡山県",1005],["広島県",978],["山口県",1015],["徳島県",1024],["香川県",1002],["愛媛県",998],["高知県",1005],["福岡県",1011],["佐賀県",1055],["長崎県",1006],["熊本県",1008],["大分県",1008],["宮崎県",977],["鹿児島県",1013],["沖縄県",944]];
+  var KAIGO=162,SHIEN=23,NENKIN=1830,KOYO=5; // 雇用保険 労働者負担 5/1,000（令和8年度・一般の事業）
+  var CAP_NENKIN=1500000,CAP_KENPO=5730000;
+  // 国税庁 令和8年分 賞与に対する源泉徴収税額の算出率の表（甲欄）。[率(10万分の1), 0人,1人,2人,3人 の「以上」の下限(千円)]
+  var TAX=[[0,0,0,0,0],[2042,82,107,143,181],[4084,94,250,276,300],[6126,260,289,321,354],[8168,309,346,377,405],[10210,342,373,400,424],[12252,372,401,426,452],[14294,402,430,457,484],[16336,433,463,492,517],[18378,520,520,525,550],[20420,605,621,636,651],[22462,684,705,728,751],[24504,715,739,764,788],[26546,752,778,804,830],[28588,795,821,848,876],[30630,854,882,910,938],[32672,922,952,983,1013],[35735,1318,1342,1367,1391],[38798,1521,1526,1526,1538],[41861,2621,2645,2669,2693],[45945,3495,3527,3559,3590]];
+  window.PREF_RATES=PREF;
+  // 本人負担分：base×率(%×100)÷2。50銭以下切り捨て、50銭超切り上げ
+  function half(base,r){var n=base*r,q=Math.floor(n/20000),m=n-q*20000;return m>10000?q+1:q;}
+  window.bonusTaxRate=function(prev,dep){
+    var r=0;for(var i=0;i<TAX.length;i++){if(prev>=TAX[i][dep+1]*1000)r=TAX[i][0];}
+    return r; // 10万分の1
+  };
+  // o: {bonus, prev(前月の社保控除後), dep(0-3), kaigo(bool), rate(健保率%×100)}
+  window.bonusCalc=function(o){
+    var b=Math.floor(o.bonus),std=Math.floor(b/1000)*1000;
+    var hb=Math.min(std,CAP_KENPO),pb=Math.min(std,CAP_NENKIN);
+    var h=half(hb,o.rate+(o.kaigo?KAIGO:0));
+    var k=half(hb,SHIEN);
+    var p=half(pb,NENKIN);
+    var en=b*KOYO,eq=Math.floor(en/1000),e=(en-eq*1000)>500?eq+1:eq;
+    var si=h+k+p+e,after=b-si;
+    var prev=Math.floor(o.prev),tax=null,rate=null;
+    if(prev>0&&after<=prev*10){rate=bonusTaxRate(prev,o.dep);tax=Math.floor(after*rate/100000);}
+    return {std:std,h:h,k:k,p:p,e:e,si:si,after:after,rate:rate,tax:tax,
+      net:tax===null?null:after-tax,capK:std>CAP_KENPO,capN:std>CAP_NENKIN};
+  };
+  var sel=document.getElementById('pref');
+  PREF.forEach(function(x,i){var op=document.createElement('option');op.value=i;op.textContent=x[0]+'（'+(x[1]/100).toFixed(2)+'%）';if(x[0]==='東京都')op.selected=true;sel.appendChild(op);});
+  function yen(n){return n.toLocaleString('ja-JP')+'円';}
+  document.getElementById('f').addEventListener('submit',function(ev){
+    ev.preventDefault();
+    var bonus=parseFloat(document.getElementById('bonus').value),prev=parseFloat(document.getElementById('prev').value);
+    if(!(bonus>0)||!(prev>=0))return;
+    var kaigo=document.getElementById('age').value==='1';
+    var o={bonus:bonus,prev:prev,dep:parseInt(document.getElementById('dep').value,10),kaigo:kaigo,rate:PREF[parseInt(sel.value,10)][1]};
+    var r=bonusCalc(o),m=[];
+    document.getElementById('kaigo').textContent=kaigo?'（介護保険料をふくむ）':'';
+    document.getElementById('h').textContent=yen(r.h);
+    document.getElementById('k').textContent=yen(r.k);
+    document.getElementById('p').textContent=yen(r.p);
+    document.getElementById('e').textContent=yen(r.e);
+    if(r.tax===null){
+      document.getElementById('t').textContent='ここでは出していません';
+      document.getElementById('sum').textContent=yen(r.si)+'＋所得税';
+      document.getElementById('biglabel').textContent='社会保険料だけを引いた額（所得税はこのあと引かれます）';
+      document.getElementById('net').innerHTML=r.after.toLocaleString('ja-JP')+'<small>円</small>';
+      m.push(prev>0?'ボーナスが前月の給与の10倍を超えているので、所得税は別の計算（月額表を使うやり方）になります。':'前月の給与がないときは、所得税は別の計算（月額表を使うやり方）になります。');
+    }else{
+      document.getElementById('t').textContent=yen(r.tax)+'（'+(r.rate/1000).toFixed(3)+'%）';
+      document.getElementById('sum').textContent=yen(r.si+r.tax);
+      document.getElementById('biglabel').textContent='ボーナスの手取り（目安）';
+      document.getElementById('net').innerHTML=r.net.toLocaleString('ja-JP')+'<small>円</small>';
+    }
+    if(r.capN)m.push('厚生年金は1回150万円までが上限なので、150万円で計算しました。');
+    if(r.capK)m.push('健康保険は年度の累計573万円までが上限なので、573万円で計算しました。');
+    else if(r.std>=2000000)m.push('健康保険は4月からのボーナスの累計が573万円を超えると、超えた分にはかかりません。夏のボーナスと合わせて超えそうな人は、実際はもう少し少なくなります。');
+    var box=document.getElementById('msg');
+    box.textContent=m.join(' ');box.style.display=m.length?'':'none';
+    document.getElementById('res').classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>
